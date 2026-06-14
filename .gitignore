@@ -127,6 +127,5 @@ all.config
 kernel/configs/android-*.cfg
 
 out/
-out
 KernelSU/
 toolchains/
