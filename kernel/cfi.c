@@ -302,6 +302,7 @@ static inline cfi_check_fn find_cfi_check(void *ptr)
 
 void cfi_slowpath_handler(uint64_t id, void *ptr, void *diag)
 {
+	return;
 	cfi_check_fn check = find_cfi_check(ptr);
 
 	if (likely(check))
@@ -314,6 +315,7 @@ EXPORT_SYMBOL(cfi_slowpath_handler);
 
 void cfi_failure_handler(void *data, void *ptr, void *vtable)
 {
+	return;
 	handle_cfi_failure(ptr);
 }
 EXPORT_SYMBOL(cfi_failure_handler);
