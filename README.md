@@ -77,9 +77,10 @@ Your kernel is located in `out/arch/arm64/boot/Image`
 Use `magiskboot` tools to replace it into your `boot.img`
 
 ## In Use
-When using SukiSu, DO NOT use meta modules based on `OverlayFS`, it would prevent your phone from booting.
+When using SukiSu, Please avoid use `Hybrid Mount` as meta module, it may prevent your phone from booting.
 
-I suspect that Linux kernel 4.14 may have poor support for OverlayFS; therefore, please use a meta module based on `Magic Mount`.
+You can try using it.If you met boot loop, you can press up and down `VOL-` at least **3 times** to enable Safe Mode.
+
 
 # LICENSE
 Closing the source code after modified or using for commercial purposes is prohibited.
