@@ -238,6 +238,21 @@ config DRM_PANEL_OPLUS21037_ILI9882N_INNOLUX_DPHY_VDO
           and uses 24-bits RGB per pixel. It provides a MIPI DSI interface
           to host.
 
+config DRM_PANEL_OPLUS21037_ILI9882N_INNOLUX_DPHY_VDO_EN_CUSTOM_FPS
+		bool "Enable ILI9882N_INNOLUX_DPHY_VDO_CUSTOM_FPS"
+		depends on DRM_PANEL_OPLUS21037_ILI9882N_INNOLUX_DPHY_VDO
+		default y
+		help
+		 Custom FPS by Akina
+
+config DRM_PANEL_OPLUS21037_ILI9882N_INNOLUX_DPHY_VDO_FPS
+		int "Set Custom FPS"
+		default 70
+		depends on DRM_PANEL_OPLUS21037_ILI9882N_INNOLUX_DPHY_VDO_EN_CUSTOM_FPS
+		range 61 75
+		help
+		 Custom FPS by Akina
+
 config DRM_PANEL_OPLUS21037_FT8006_TRULY_DPHY_VDO
         tristate "ILI DPHY 720p vdo mode panel"
         depends on OF

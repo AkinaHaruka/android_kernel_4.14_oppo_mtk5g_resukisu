@@ -520,6 +520,25 @@ static int lcm_enable(struct drm_panel *panel)
 #define VAC (1600)
 #define HAC (720)
 
+#ifdef CONFIG_DRM_PANEL_OPLUS21037_ILI9882N_INNOLUX_DPHY_VDO_EN_CUSTOM_FPS
+#define CUST_FPS   (CONFIG_DRM_PANEL_OPLUS21037_ILI9882N_INNOLUX_DPHY_VDO_FPS)
+#define CUST_CLOCK ((CUST_FPS * (HAC + 26 + 8 + 17) * (VAC + 243 + 2 + 16)) / 1000)
+static struct drm_display_mode cust_mode = {
+	.clock = CUST_CLOCK,
+	.hdisplay = HAC,
+	.hsync_start = HAC + 26,//HFP
+	.hsync_end = HAC + 26 + 8,//HSA
+	.htotal = HAC + 26 + 8 + 17,//HBP1289
+	.vdisplay = VAC,
+	.vsync_start = VAC + 243,//VFP
+	.vsync_end = VAC + 243 + 2,//VSA
+	.vtotal = VAC + 243 + 2 + 16,//VBP4948
+	.vrefresh = CUST_FPS,
+};
+#else
+#define CUST_FPS  60
+#endif
+
 static struct drm_display_mode default_mode = {
 	.clock = 85997,
 	.hdisplay = HAC,
@@ -533,6 +552,7 @@ static struct drm_display_mode default_mode = {
 	.vrefresh = 60,
 };
 
+
 #if defined(CONFIG_MTK_PANEL_EXT)
 static struct mtk_panel_params ext_params = {
 	//.pll_clk = 553,
@@ -542,12 +562,12 @@ static struct mtk_panel_params ext_params = {
 	.lcm_esd_check_table[0] = {
 		.cmd = 0x0A, .count = 1, .para_list[0] = 0x9c, .mask_list[0] = 0x9c,
 	},
-	.data_rate = 733,
+	.data_rate = (733 * CUST_FPS) / 60,
 	.dyn = {
-		.pll_clk = 362,
+		.pll_clk = (362 * CUST_FPS) / 60,
 		.switch_en = 1,
-		.data_rate = 724,
-		.hbp = 12,
+		.data_rate = (724 * CUST_FPS) / 60,
+		.hbp = (12 * CUST_FPS) / 60,
 	},
 	.oplus_teot_ns_multiplier = 90,
 	.vendor = "21037_ili9882n_innolux",
@@ -711,7 +731,9 @@ static int lcm_get_modes(struct drm_panel *panel)
 {
 	struct drm_display_mode *mode;
 
-	mode = drm_mode_duplicate(panel->drm, &default_mode);
+	// Cust FPS begin
+	#ifdef CONFIG_DRM_PANEL_OPLUS21037_ILI9882N_INNOLUX_DPHY_VDO_EN_CUSTOM_FPS
+	mode = drm_mode_duplicate(panel->drm, &cust_mode);
 	if (!mode) {
 		dev_err(panel->drm->dev, "failed to add mode %ux%ux@%u\n",
 			default_mode.hdisplay, default_mode.vdisplay,
@@ -722,10 +744,34 @@ static int lcm_get_modes(struct drm_panel *panel)
 	drm_mode_set_name(mode);
 	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
 	drm_mode_probed_add(panel->connector, mode);
+	#endif
+	// Cust FPS end
+
+	// Default FPS begin
+	mode = drm_mode_duplicate(panel->drm, &default_mode);
+	if (!mode) {
+		dev_err(panel->drm->dev, "failed to add mode %ux%ux@%u\n",
+			default_mode.hdisplay, default_mode.vdisplay,
+			default_mode.vrefresh);
+		return -ENOMEM;
+	}
+
+	drm_mode_set_name(mode);
+	#ifndef CONFIG_DRM_PANEL_OPLUS21037_ILI9882N_INNOLUX_DPHY_VDO_EN_CUSTOM_FPS
+	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
+	#else
+	mode->type = DRM_MODE_TYPE_DRIVER;
+	#endif
+	drm_mode_probed_add(panel->connector, mode);
+	// Default FPS end
+
 
 	panel->connector->display_info.width_mm = 68;
 	panel->connector->display_info.height_mm = 151;
 
+	#ifdef CONFIG_DRM_PANEL_OPLUS21037_ILI9882N_INNOLUX_DPHY_VDO_EN_CUSTOM_FPS
+	return 2;
+	#endif
 	return 1;
 }
 
